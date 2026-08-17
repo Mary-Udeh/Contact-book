@@ -1,131 +1,165 @@
-  let contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+// Class Created
+class ContactManager {
+  constructor() {
+    // 1. Initialize State
+    this.contacts = JSON.parse(localStorage.getItem('contacts')) || [];
 
-  const contactForm = document.getElementById('contact-form');
-  const nameInput = document.getElementById('name');
-  const phoneInput = document.getElementById('phone');
-  const emailInput = document.getElementById('email');
-  const editIndexInput = document.getElementById('edit-index');
-  const submitBtn = document.getElementById('submit-btn');
-  const cancelBtn = document.getElementById('cancel-btn');
-  const searchInput = document.getElementById('search-input');
-  const contactList = document.getElementById('contact-list');
-  const errorMsg = document.getElementById('error-msg');
+    // 2. Cache DOM Elements
+    this.contactForm = document.getElementById('contact-form');
+    this.nameInput = document.getElementById('name');
+    this.phoneInput = document.getElementById('phone');
+    this.emailInput = document.getElementById('email');
+    this.editIndexInput = document.getElementById('edit-index');
+    this.submitBtn = document.getElementById('submit-btn');
+    this.cancelBtn = document.getElementById('cancel-btn');
+    this.searchInput = document.getElementById('search-input');
+    this.contactList = document.getElementById('contact-list');
+    this.errorMsg = document.getElementById('error-msg');
 
-  // Regex Patterns for Validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^\+?[0-9\s\-]{7,15}$/;
+    // 3. Validation Rules
+    this.emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.phoneRegex = /^\+?[0-9\s\-]{7,15}$/;
 
-  function saveAndRender() {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-    renderContacts();
+    // 4. Start App
+    this.initEventListeners();
+    this.renderContacts();
   }
 
-  function validateInputs(name, phone, email) {
+  // Method: Set up DOM event listeners
+  initEventListeners() {
+    this.contactForm.addEventListener('submit', (e) => this.handleSubmit(e));
+    this.cancelBtn.addEventListener('click', () => this.resetForm());
+    this.searchInput.addEventListener('input', (e) => this.renderContacts(e.target.value));
+
+    // Event delegation for dynamic Edit/Delete buttons
+    this.contactList.addEventListener('click', (e) => {
+      const index = e.target.dataset.index;
+      if (e.target.classList.contains('edit-btn')) {
+        this.startEdit(index);
+      } else if (e.target.classList.contains('delete-btn')) {
+        this.deleteContact(index);
+      }
+    });
+  }
+
+  // Method: Save to LocalStorage and trigger render
+  saveAndRender() {
+    localStorage.setItem('contacts', JSON.stringify(this.contacts));
+    this.renderContacts();
+  }
+
+  // Method: Validate form fields
+  validateInputs(name, phone, email) {
     if (!name.trim()) return "Name cannot be empty.";
-    if (!phoneRegex.test(phone)) return "Please enter a valid phone number.";
-    if (!emailRegex.test(email)) return "Please enter a valid email address.";
+    if (!this.phoneRegex.test(phone)) return "Please enter a valid phone number.";
+    if (!this.emailRegex.test(email)) return "Please enter a valid email address.";
     return null;
   }
 
-  function renderContacts(filterText = '') {
-    contactList.innerHTML = '';
-    
-    const filteredContacts = contacts.filter(c => 
-      c.name.toLowerCase().includes(filterText.toLowerCase())
-    );
+  // Method: Render contacts list to DOM using explicit loops
+  renderContacts(filterText = '') {
+    this.contactList.innerHTML = '';
+
+    // Loop 1: Filter contacts using a for...of loop
+    const filteredContacts = [];
+    for (const contact of this.contacts) {
+      if (contact.name.toLowerCase().includes(filterText.toLowerCase())) {
+        filteredContacts.push(contact);
+      }
+    }
 
     if (filteredContacts.length === 0) {
-      contactList.innerHTML = '<li class="empty-list">No contacts found.</li>';
+      this.contactList.innerHTML = '<li class="empty-list">No contacts found.</li>';
       return;
     }
 
-    filteredContacts.forEach((contact, index) => {
-      // Find actual index in global contacts array
-      const originalIndex = contacts.indexOf(contact);
+    // Loop 2: Loop through filtered contacts to build DOM cards
+    for (let i = 0; i < filteredContacts.length; i++) {
+      const contact = filteredContacts[i];
+      const originalIndex = this.contacts.indexOf(contact);
 
       const li = document.createElement('li');
       li.className = 'contact-card';
       li.innerHTML = `
         <div class="contact-info">
-          <p><strong>${escapeHtml(contact.name)}</strong></p>
-          <p>📞 ${escapeHtml(contact.phone)}</p>
-          <p>✉️ ${escapeHtml(contact.email)}</p>
+          <p><strong>${this.escapeHtml(contact.name)}</strong></p>
+          <p>📞 ${this.escapeHtml(contact.phone)}</p>
+          <p>✉️ ${this.escapeHtml(contact.email)}</p>
         </div>
         <div class="card-actions">
-          <button class="edit-btn" onclick="startEdit(${originalIndex})">Edit</button>
-          <button class="delete-btn" onclick="deleteContact(${originalIndex})">Delete</button>
+          <button class="edit-btn" data-index="${originalIndex}">Edit</button>
+          <button class="delete-btn" data-index="${originalIndex}">Delete</button>
         </div>
       `;
-      contactList.appendChild(li);
-    });
+      this.contactList.appendChild(li);
+    }
   }
 
-  function escapeHtml(text) {
+  // Method: Sanitize text to prevent XSS
+  escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   }
 
-  // Handle Add / Edit Submission
-  contactForm.addEventListener('submit', (e) => {
+  // Method: Handle Form Submission (Add or Edit)
+  handleSubmit(e) {
     e.preventDefault();
-    errorMsg.style.display = 'none';
+    this.errorMsg.style.display = 'none';
 
-    const name = nameInput.value.trim();
-    const phone = phoneInput.value.trim();
-    const email = emailInput.value.trim();
-    const editIndex = parseInt(editIndexInput.value);
+    const name = this.nameInput.value.trim();
+    const phone = this.phoneInput.value.trim();
+    const email = this.emailInput.value.trim();
+    const editIndex = parseInt(this.editIndexInput.value);
 
-    const validationError = validateInputs(name, phone, email);
+    const validationError = this.validateInputs(name, phone, email);
     if (validationError) {
-      errorMsg.textContent = validationError;
-      errorMsg.style.display = 'block';
+      this.errorMsg.textContent = validationError;
+      this.errorMsg.style.display = 'block';
       return;
     }
 
     if (editIndex === -1) {
-      // Add Contact
-      contacts.push({ name, phone, email });
+      this.contacts.push({ name, phone, email });
     } else {
-      // Edit Contact
-      contacts[editIndex] = { name, phone, email };
-      resetForm();
+      this.contacts[editIndex] = { name, phone, email };
+      this.resetForm();
     }
 
-    contactForm.reset();
-    saveAndRender();
-  });
+    this.contactForm.reset();
+    this.saveAndRender();
+  }
 
-  function startEdit(index) {
-    const contact = contacts[index];
-    nameInput.value = contact.name;
-    phoneInput.value = contact.phone;
-    emailInput.value = contact.email;
-    editIndexInput.value = index;
+  // Method: Load contact into form for editing
+  startEdit(index) {
+    const contact = this.contacts[index];
+    this.nameInput.value = contact.name;
+    this.phoneInput.value = contact.phone;
+    this.emailInput.value = contact.email;
+    this.editIndexInput.value = index;
 
-    submitBtn.textContent = 'Update Contact';
-    cancelBtn.style.display = 'block';
+    this.submitBtn.textContent = 'Update Contact';
+    this.cancelBtn.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function deleteContact(index) {
+  // Method: Delete contact
+  deleteContact(index) {
     if (confirm('Are you sure you want to delete this contact?')) {
-      contacts.splice(index, 1);
-      saveAndRender();
-      if (editIndexInput.value == index) resetForm();
+      this.contacts.splice(index, 1);
+      this.saveAndRender();
+      if (this.editIndexInput.value == index) this.resetForm();
     }
   }
 
-  function resetForm() {
-    editIndexInput.value = '-1';
-    submitBtn.textContent = 'Add Contact';
-    cancelBtn.style.display = 'none';
-    contactForm.reset();
+  // Method: Reset form UI back to default "Add" state
+  resetForm() {
+    this.editIndexInput.value = '-1';
+    this.submitBtn.textContent = 'Add Contact';
+    this.cancelBtn.style.display = 'none';
+    this.contactForm.reset();
   }
+}
 
-  cancelBtn.addEventListener('click', resetForm);
-
-  searchInput.addEventListener('input', (e) => {
-    renderContacts(e.target.value);
-  });
-
-  // Initial Load
-  renderContacts();
+// Instantiate the Class
+document.addEventListener('DOMContentLoaded', () => {
+  new ContactManager();
+});
