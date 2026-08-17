@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Book</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>My Contact Book</h1>
+
+      <!-- Contact Form (Add / Edit) -->
+      <form id="contact-form">
+        <input type="hidden" id="edit-index" value="-1" />
+        <input type="text" id="name" placeholder="Full Name" required />
+        <input
+          type="tel"
+          id="phone"
+          placeholder="Phone Number (e.g., +1234567890 or 08012345678)"
+          required
+        />
+        <input type="email" id="email" placeholder="Email Address" required />
+        <span class="error-msg" id="error-msg"></span>
+        <div class="btn-group">
+          <button type="submit" id="submit-btn">Add Contact</button>
+          <button
+            type="button"
+            id="cancel-btn"
+            class="cancel-btn"
+            style="display: none"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd" />
+
+      <!-- Search Input -->
+      <div class="search-container">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search contacts by name..."
+        />
+      </div>
+
+      <!-- Contacts List -->
+      <ul class="contact-list" id="contact-list"></ul>
+    </div>
+  </body>
+</html>
