@@ -1,0 +1,122 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+body {
+  background-color: #f4f6f8;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+.container {
+  width: 100%;
+  max-width: 650px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+h1 {
+  text-align: center;
+  color: #1a4d4e;
+  margin-bottom: 20px;
+}
+
+form,
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+input {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+input:focus {
+  border-color: #1a4d4e;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+}
+button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #1a4d4e;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #133839;
+}
+button.cancel-btn {
+  background-color: #6c757d;
+}
+button.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+.error-msg {
+  color: #d9534f;
+  font-size: 13px;
+  display: none;
+}
+
+.contact-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.contact-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+}
+.contact-info p {
+  margin: 2px 0;
+  font-size: 14px;
+}
+.contact-info strong {
+  color: #333;
+  font-size: 16px;
+}
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+.card-actions button {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.edit-btn {
+  background-color: #f0ad4e;
+}
+.edit-btn:hover {
+  background-color: #ec971f;
+}
+.delete-btn {
+  background-color: #d9534f;
+}
+.delete-btn:hover {
+  background-color: #c9302c;
+}
+.empty-list {
+  text-align: center;
+  color: #888;
+  margin-top: 10px;
+}
